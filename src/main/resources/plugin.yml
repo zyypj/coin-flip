@@ -1,0 +1,7 @@
+name: CoinFlip
+version: '${project.version}'
+main: gg.discord.mrkk.tadeu.coinflip.Main
+softdepend: [ PlayerPoints, Vault ]
+commands:
+  coinflip:
+    aliases: [caraoucoroa]

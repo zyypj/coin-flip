@@ -1,0 +1,55 @@
+debug: false
+# DEIXE SEMPRE FALSO, USADO PARA DEBUG
+bet-yourself: false
+
+min-cash-value-for-broadcast: 100
+min-coins-value-for-broadcast: 100000
+broadcast-command: "bbroadcast &aO jogador {WINNER} ganhou uma aposta com valor {AMOUNT} de {MOEDA} em cima de {LOSSER}!"
+
+select-economy-menu:
+  title: O que você quer apostar?
+  coins-item:
+    name: "&a&lCoins"
+    # Use value
+    head: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTFlZGYxNmM0MWQxOTRjNzMxZTMzZmRkOWMyYjllNWVkZDQ1MGJjMzNjYTcwNDM2NTI4YTA1Mzg5ZDdmY2RhMiJ9fX0=
+    lore:
+      - " "
+      - "&eClique aqui para apostar &aCoins"
+  cash-item:
+    name: "&6&lCash"
+    head: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjBhN2I5NGM0ZTU4MWI2OTkxNTlkNDg4NDZlYzA5MTM5MjUwNjIzN2M4OWE5N2M5MzI0OGEwZDhhYmM5MTZkNSJ9fX0=
+    lore:
+      - " "
+      - "&eClique aqui para apostar &6&lCash"
+
+bet-menu:
+  title: "&aApostas Disponíveis"
+  item:
+    name: "&eAposta de {PLAYER}"
+    lore:
+      - "&aTipo: {TYPE}"
+      - "&aValor: {VALUE}"
+      - " "
+      - "&7Clique para desafiar!"
+  empty-item:
+    name: "&cNenhuma aposta encontrada"
+    lore:
+      - "&7Tente mudar o filtro ou aguarde novas apostas."
+
+animation-menu:
+  title: "&aDecidindo o Vencedor..."
+
+messages:
+  no-permission: "&cVocê não tem permissão para isso!"
+  coins-chosen: "&aVocê escolheu Coins! Escreva no chat a quantidade que deseja apostar ou cancelar para cancelar."
+  dont-have-coins: "&cVocê não tem Coins suficientes para apostar!"
+  betted-coins: "&aVocê apostou {AMOUNT} de Coins!"
+  cash-chosen: "&aVocê escolheu Cash! Escreva no chat a quantidade que deseja apostar ou cancelar para cancelar."
+  dont-have-cash: "&cVocê não tem Cash suficientes para apostar!"
+  betted-cash: "&aVocê apostou {AMOUNT} de Cash!"
+  bet-canceled: "&cAposta cancelada."
+  bet-not-found: "&cA aposta não está mais disponível!"
+  already-active-bet: "&cVocê já tem uma aposta ativa!"
+  insufficient-balance: "&cVocê não tem saldo suficiente de {MOEDA}!"
+  bet-win: "&aVocê ganhou &6{AMOUNT} de {MOEDA}&a, parabéns!"
+  bet-lose: "&cVocê perdeu &6{AMOUNT} de MOEDA&a!"
