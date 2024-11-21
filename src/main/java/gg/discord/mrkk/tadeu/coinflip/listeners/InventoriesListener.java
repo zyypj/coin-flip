@@ -2,9 +2,12 @@ package gg.discord.mrkk.tadeu.coinflip.listeners;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import gg.discord.mrkk.tadeu.coinflip.configuration.Configuration;
+import gg.discord.mrkk.tadeu.coinflip.hooks.CashIntegration;
+import gg.discord.mrkk.tadeu.coinflip.hooks.CoinsIntegration;
 import gg.discord.mrkk.tadeu.coinflip.inventories.BetAnimationInventory;
 import gg.discord.mrkk.tadeu.coinflip.inventories.BetInventory;
 import gg.discord.mrkk.tadeu.coinflip.systems.bet.BetManager;
+import gg.discord.mrkk.tadeu.coinflip.systems.response.ResponseHandler;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -41,7 +44,7 @@ public class InventoriesListener implements Listener {
 
         if (protectedInventories.containsKey(player.getUniqueId())) {
             BetAnimationInventory inventory = protectedInventories.get(player.getUniqueId());
-            inventory.openInventory(player, viewer -> {});
+            inventory.openInventory(player);
         }
     }
 
@@ -64,11 +67,22 @@ public class InventoriesListener implements Listener {
 
         BetInventory betInventory = inventoryMap.computeIfAbsent(player.getUniqueId(), uuid -> new BetInventory(plugin));
 
+        Configuration configuration = plugin.getConfiguration();
+        ResponseHandler responseHandler = plugin.getResponseHandler();
+
         switch (slot) {
-            case 37:
+            case 36:
                 betInventory.handleNavigationClick(player, inventory, 37);
                 break;
+            case 37:
+                responseHandler.handleCoinsResponse(player);
+                player.closeInventory();
+                break;
             case 43:
+                responseHandler.handleCashResponse(player);
+                player.closeInventory();
+                break;
+            case 44:
                 betInventory.handleNavigationClick(player, inventory, 43);
                 break;
             case 40:
@@ -100,9 +114,20 @@ public class InventoriesListener implements Listener {
         BetManager.Bet bet = betManager.getBet(creatorName);
 
         if (bet != null) {
+            double betValue = Double.parseDouble(bet.getValue());
             boolean isCash = bet.getType().equalsIgnoreCase("Cash");
+
+            // Revalida os saldos dos jogadores antes de aceitar a aposta
+            if (!validateBalances(challenger, creator, betValue, isCash)) {
+                challenger.sendMessage(config.getMessage("insufficient-balance-challenger"));
+                creator.sendMessage(config.getMessage("insufficient-balance-creator"));
+
+                betManager.removeBet(creatorName);
+                return;
+            }
+
             if (betManager.processBet(challenger, bet, isCash)) {
-                creator.sendMessage("§aA aposta foi aceita. Boa sorte!");
+                creator.sendMessage("§aA sua aposta foi aceita por " + challenger.getName() + ". Boa sorte!");
                 challenger.sendMessage("§aA aposta foi aceita. Boa sorte!");
             }
         } else {
@@ -117,6 +142,29 @@ public class InventoriesListener implements Listener {
             return rawName.replace(prefix, "").trim();
         }
         return null;
+    }
+
+    private boolean validateBalances(Player challenger, Player creator, double betValue, boolean isCash) {
+        if (isCash) {
+            // Verifica saldo em Cash
+            CashIntegration cashIntegration = plugin.getCashIntegration();
+            if (cashIntegration.getPpAPI().look(challenger.getUniqueId()) < betValue) {
+                return false;
+            }
+            if (cashIntegration.getPpAPI().look(creator.getUniqueId()) < betValue) {
+                return false;
+            }
+        } else {
+            // Verifica saldo em Coins
+            CoinsIntegration coinsIntegration = plugin.getCoinsIntegration();
+            if (coinsIntegration.getEcon().getBalance(challenger) < betValue) {
+                return false;
+            }
+            if (coinsIntegration.getEcon().getBalance(creator) < betValue) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void protectPlayer(Player player, BetAnimationInventory inventory) {

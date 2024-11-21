@@ -68,8 +68,8 @@ public class BetManager {
             inventoriesListener.protectPlayer(challenger, challengerInventory);
             inventoriesListener.protectPlayer(creator, creatorInventory);
 
-            challengerInventory.openInventory(challenger, viewer -> {});
-            creatorInventory.openInventory(creator, viewer -> {});
+            challengerInventory.openInventory(challenger);
+            creatorInventory.openInventory(creator);
         }, 5L);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -116,20 +116,25 @@ public class BetManager {
     private void handleWinnerLoser(Player challenger, Player creator, double betValue, boolean isCash, Player winner) {
         Player loser = winner.equals(challenger) ? creator : challenger;
 
+        // Calcula o valor do bônus (15%)
+        double winRate = configuration.getConfig().getDouble("win-rate", 15);
+        double bonus = betValue * (winRate / 100);
+        double totalWinAmount = betValue + bonus;
+
         // Integração para ajustar saldo do vencedor e perdedor
         if (isCash) {
             CashIntegration cashIntegration = plugin.getCashIntegration();
             cashIntegration.getPpAPI().take(loser.getUniqueId(), (int) betValue);
-            cashIntegration.getPpAPI().give(winner.getUniqueId(), (int) betValue);
+            cashIntegration.getPpAPI().give(winner.getUniqueId(), (int) totalWinAmount);
         } else {
             CoinsIntegration coinsIntegration = plugin.getCoinsIntegration();
             coinsIntegration.getEcon().withdrawPlayer(loser, betValue);
-            coinsIntegration.getEcon().depositPlayer(winner, betValue);
+            coinsIntegration.getEcon().depositPlayer(winner, totalWinAmount);
         }
 
         // Envia mensagem personalizada para vencedor e perdedor
         winner.sendMessage(configuration.getMessage("bet-win")
-                .replace("{AMOUNT}", String.valueOf(betValue))
+                .replace("{AMOUNT}", String.valueOf(totalWinAmount))
                 .replace("{MOEDA}", (isCash ? "cash" : "coins")));
         loser.sendMessage(configuration.getMessage("bet-lose")
                 .replace("{AMOUNT}", String.valueOf(betValue))
@@ -143,8 +148,8 @@ public class BetManager {
         if (betValue >= minBroadcastValue) {
             String broadcastCommand = configuration.getString("broadcast-command")
                     .replace("{WINNER}", winner.getName())
-                    .replace("{LOSSER}", loser.getName())
-                    .replace("{AMOUNT}", String.valueOf(betValue))
+                    .replace("{LOSER}", loser.getName())
+                    .replace("{AMOUNT}", String.valueOf(totalWinAmount))
                     .replace("{MOEDA}", (isCash ? "cash" : "coins"));
 
             // Executa o comando de broadcast

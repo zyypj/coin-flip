@@ -1,20 +1,17 @@
 package gg.discord.mrkk.tadeu.coinflip.inventories;
 
-import com.henryfabio.minecraft.inventoryapi.inventory.impl.simple.SimpleInventory;
-import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
-import com.henryfabio.minecraft.inventoryapi.editor.InventoryEditor;
-import com.henryfabio.minecraft.inventoryapi.item.InventoryItem;
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import gg.discord.mrkk.tadeu.coinflip.systems.head.HeadUtil;
-import me.syncwrld.booter.minecraft.tool.item.ItemBuilder;
-import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
-@Getter
-public class BetAnimationInventory extends SimpleInventory {
+public class BetAnimationInventory {
 
     private final Main plugin;
     private final Player viewerPlayer;
@@ -22,105 +19,109 @@ public class BetAnimationInventory extends SimpleInventory {
     private final Player winner;
     private int iterations = 0;
     private boolean toggle = true;
+    private Inventory inventory;
 
     public BetAnimationInventory(Main plugin, Player viewerPlayer, Player otherPlayer, Player winner) {
-        super(
-                "bet-animation",
-                plugin.getConfiguration().getString("animation-menu.title"),
-                3 * 9
-        );
-
         this.plugin = plugin;
         this.viewerPlayer = viewerPlayer;
         this.otherPlayer = otherPlayer;
         this.winner = winner;
-
-        configuration(configuration -> configuration.secondUpdate(1)); // Controla manualmente os updates
-        this.init();
     }
 
-    @Override
-    protected void configureInventory(Viewer viewer, InventoryEditor editor) {
-        // Preenche o inventário inteiramente com espaços vazios inicialmente
-        for (int i = 0; i < getSize(); i++) {
-            editor.setItem(i, InventoryItem.of(new ItemBuilder(Material.AIR).create()));
+    public void openInventory(Player player) {
+        inventory = Bukkit.createInventory(null, 27, plugin.getConfiguration().getString("animation-menu.title"));
+        initializeInventory();
+
+        player.openInventory(inventory);
+        startAnimation();
+    }
+
+    private void initializeInventory() {
+        // Preenche o inventário com vidros verdes (apenas inicial)
+        for (int i = 0; i < 27; i++) {
+            inventory.setItem(i, createPane(Material.STAINED_GLASS_PANE, (short) 5, " "));
         }
-
-        // Slot inicial no meio (13) com um espaço vazio
-        editor.setItem(13, InventoryItem.of(new ItemBuilder(Material.AIR).create()));
+        // Define um espaço vazio no centro
+        inventory.setItem(13, new ItemStack(Material.AIR));
     }
 
-    @Override
-    protected void update(Viewer viewer, InventoryEditor editor) {
-        // Itens de painel de vidro para animação
-        ItemStack darkGreenPane = new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (short) 13)
-                .setName(" ")
-                .create();
-
-        ItemStack lightGreenPane = new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (short) 5)
-                .setName(" ")
-                .create();
-
-        // Cabeças para animação
-        ItemStack viewerHead = new ItemBuilder(HeadUtil.getPlayerSkull(viewerPlayer.getName()))
-                .setName("§a" + viewerPlayer.getName())
-                .create();
-
-        ItemStack otherHead = new ItemBuilder(HeadUtil.getPlayerSkull(otherPlayer.getName()))
-                .setName("§a" + otherPlayer.getName())
-                .create();
-
-        ItemStack winnerHead = new ItemBuilder(HeadUtil.getPlayerSkull(winner.getName()))
-                .setName("§6" + winner.getName() + " §7(Vencedor)")
-                .create();
-
-        if (iterations >= 10) { // Finaliza a animação após 10 iterações
-            // Define apenas a cabeça do vencedor no slot central
-            editor.setItem(13, InventoryItem.of(winnerHead).defaultCallback(event -> event.setCancelled(true)));
-            editor.updateItemStack(13);
-
-            // Remove todos os outros itens do inventário
-            for (int i = 0; i < getSize(); i++) {
-                if (i != 13) {
-                    editor.setItem(i, InventoryItem.of(new ItemBuilder(Material.AIR).create()));
+    private void startAnimation() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (iterations >= 20) {
+                    finishAnimation();
+                    cancel();
+                    return;
                 }
+
+                updateAnimation();
+                toggle = !toggle;
+                iterations++;
             }
+        }.runTaskTimer(plugin, 0L, 10L); // Atualização a cada 10 ticks (0.50 segundos)
+    }
 
-            editor.updateAllItemStacks();
+    private void updateAnimation() {
+        // Define os painéis verdes alternados
+        ItemStack darkGreenPane = createPane(Material.STAINED_GLASS_PANE, (short) 13, " ");
+        ItemStack lightGreenPane = createPane(Material.STAINED_GLASS_PANE, (short) 5, " ");
 
-            // Toca um som para indicar o resultado
-            if (iterations == 10) {
-                viewer.getPlayer().playSound(viewer.getPlayer().getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
-            }
-            plugin.getInventoriesListener().unprotectPlayer(viewer.getPlayer());
-
-            // Isso impede do som tocar infinitamente, transformando a iteração para 11
-            iterations++;
-            return;
-        }
-
-        // Alterna as cores dos painéis de vidro por linha
+        // Atualiza as linhas com alternância
         for (int i = 0; i < 9; i++) {
-            editor.setItem(i, InventoryItem.of(toggle ? lightGreenPane : darkGreenPane));
+            inventory.setItem(i, toggle ? lightGreenPane : darkGreenPane);
         }
         for (int i = 9; i < 18; i++) {
-            if (i == 13) continue; // Ignora o slot central
-            editor.setItem(i, InventoryItem.of(toggle ? darkGreenPane : lightGreenPane));
+            if (i != 13) { // Ignora o slot central
+                inventory.setItem(i, toggle ? darkGreenPane : lightGreenPane);
+            }
         }
         for (int i = 18; i < 27; i++) {
-            editor.setItem(i, InventoryItem.of(toggle ? lightGreenPane : darkGreenPane));
+            inventory.setItem(i, toggle ? lightGreenPane : darkGreenPane);
         }
 
-        ItemStack currentHead = toggle ? viewerHead : otherHead;
-        editor.setItem(13, InventoryItem.of(currentHead).defaultCallback(event -> event.setCancelled(true)));
+        // Alterna entre as cabeças do jogador e do adversário no slot central
+        ItemStack viewerHead = createHead(viewerPlayer.getName(), "§a" + viewerPlayer.getName());
+        ItemStack otherHead = createHead(otherPlayer.getName(), "§a" + otherPlayer.getName());
+        inventory.setItem(13, toggle ? viewerHead : otherHead);
 
-        // Atualiza todos os itens do inventário
-        editor.updateAllItemStacks();
+        // Toca o som de troca
+        viewerPlayer.playSound(viewerPlayer.getLocation(), Sound.NOTE_PLING, 1.0f, 1.5f);
+    }
 
-        // Toca um som para cada troca
-        viewer.getPlayer().playSound(viewer.getPlayer().getLocation(), Sound.NOTE_PLING, 1.0f, 1.5f);
+    private void finishAnimation() {
+        // Define a cabeça do vencedor no centro
+        ItemStack winnerHead = createHead(winner.getName(), "§6" + winner.getName() + " §7(Vencedor)");
+        inventory.setItem(13, winnerHead);
 
-        toggle = !toggle;
-        iterations++;
+        // Limpa o restante do inventário
+        for (int i = 0; i < 27; i++) {
+            if (i != 13) {
+                inventory.setItem(i, new ItemStack(Material.AIR));
+            }
+        }
+
+        // Toca o som final
+        viewerPlayer.playSound(viewerPlayer.getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
+    }
+
+    private ItemStack createPane(Material material, short color, String name) {
+        ItemStack item = new ItemStack(material, 1, color);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(name);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    private ItemStack createHead(String playerName, String displayName) {
+        ItemStack head = HeadUtil.getPlayerSkull(playerName);
+        ItemMeta meta = head.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(displayName);
+            head.setItemMeta(meta);
+        }
+        return head;
     }
 }

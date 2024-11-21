@@ -36,6 +36,7 @@ public class BetInventory {
         inventory.clear();
         addBorders(inventory);
         addBets(player, inventory);
+        addEconomiesItens(inventory);
         addNavigationButtons(player, inventory);
         addFilterItem(player, inventory);
     }
@@ -93,12 +94,22 @@ public class BetInventory {
         int totalPages = (int) Math.ceil((double) betManager.getAllBets().size() / 16);
 
         if (currentPage > 1) {
-            inventory.setItem(37, createNavigationItem("§aPágina Anterior"));
+            inventory.setItem(36, createNavigationItem("§aPágina Anterior"));
         }
 
         if (currentPage < totalPages) {
-            inventory.setItem(43, createNavigationItem("§aPróxima Página"));
+            inventory.setItem(44, createNavigationItem("§aPróxima Página"));
         }
+    }
+
+    private void addEconomiesItens(Inventory inventory) {
+        // Obtém os dados dos itens Coins e Cash da configuração
+        Configuration.ItemData coinsItemData = configuration.getCoinsItem();
+        Configuration.ItemData cashItemData = configuration.getCashItem();
+
+        // Adiciona os itens no inventário nos slots 37 e 43
+        inventory.setItem(37, coinsItemData.toItemStack());
+        inventory.setItem(43, cashItemData.toItemStack());
     }
 
     private void addFilterItem(Player player, Inventory inventory) {

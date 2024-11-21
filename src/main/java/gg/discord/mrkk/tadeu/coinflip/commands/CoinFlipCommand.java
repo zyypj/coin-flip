@@ -2,7 +2,6 @@ package gg.discord.mrkk.tadeu.coinflip.commands;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import gg.discord.mrkk.tadeu.coinflip.configuration.Configuration;
-import gg.discord.mrkk.tadeu.coinflip.inventories.SelectEconomyInventory;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,28 +37,16 @@ public class CoinFlipCommand implements CommandExecutor {
                 player.sendMessage("§aConfigurações e inventários recarregados");
                 return true;
             }
-            
-            if (args[0].equalsIgnoreCase("apostar")) {
-                plugin.getViews().getSelectEconomyInventory().openInventory(player);
-                return true;
-            }
-
-            if (args[0].equalsIgnoreCase("apostas")) {
-                plugin.getViews().getBetInventory().open(player);
-                return true;
-            }
 
             sendHelp(player);
             return false;
         }
 
-        sendHelp(player);
-        return false;
+        plugin.getViews().getBetInventory().open(player);
+        return true;
     }
     
     private void sendHelp(Player player) {
-        player.sendMessage("§e/coinflip apostar");
-        player.sendMessage("§e/coinflip apostas");
         if (player.hasPermission("coinflip.reload")) {
             player.sendMessage("§e/coinflip reload");
         }
