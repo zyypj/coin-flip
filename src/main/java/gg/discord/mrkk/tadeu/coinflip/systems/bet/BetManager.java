@@ -119,15 +119,25 @@ public class BetManager {
         // Calcula o valor do bônus (15%)
         double winRate = configuration.getConfig().getDouble("win-rate", 15);
         double bonus = betValue * (winRate / 100);
-        double totalWinAmount = betValue + bonus;
+        double totalWinAmount = betValue - bonus;
 
+        if (!validateBalances(challenger, creator, betValue, isCash)) {
+            challenger.sendMessage(plugin.getConfiguration().getMessage("insufficient-balance-challenger"));
+            creator.sendMessage(plugin.getConfiguration().getMessage("insufficient-balance-creator"));
+            return;
+        }
+        
         // Integração para ajustar saldo do vencedor e perdedor
         if (isCash) {
+            
             CashIntegration cashIntegration = plugin.getCashIntegration();
+            
             cashIntegration.getPpAPI().take(loser.getUniqueId(), (int) betValue);
             cashIntegration.getPpAPI().give(winner.getUniqueId(), (int) totalWinAmount);
         } else {
+
             CoinsIntegration coinsIntegration = plugin.getCoinsIntegration();
+            
             coinsIntegration.getEcon().withdrawPlayer(loser, betValue);
             coinsIntegration.getEcon().depositPlayer(winner, totalWinAmount);
         }
