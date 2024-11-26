@@ -15,6 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/*
+Lightweight class to ask for a response for a player
+@author: syncwrld
+@website: https://github.com/syncwrld
+ */
 public class ResponseWaiter implements Listener {
 
     private final Main plugin;
