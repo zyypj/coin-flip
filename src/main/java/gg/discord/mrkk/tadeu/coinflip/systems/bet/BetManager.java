@@ -2,10 +2,10 @@ package gg.discord.mrkk.tadeu.coinflip.systems.bet;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import gg.discord.mrkk.tadeu.coinflip.configuration.Configuration;
-import gg.discord.mrkk.tadeu.coinflip.hooks.CashIntegration;
-import gg.discord.mrkk.tadeu.coinflip.hooks.CoinsIntegration;
-import gg.discord.mrkk.tadeu.coinflip.inventories.BetAnimationInventory;
-import gg.discord.mrkk.tadeu.coinflip.listeners.InventoriesListener;
+import gg.discord.mrkk.tadeu.coinflip.integrations.CashIntegration;
+import gg.discord.mrkk.tadeu.coinflip.integrations.CoinsIntegration;
+import gg.discord.mrkk.tadeu.coinflip.systems.inventories.BetAnimationInventory;
+import gg.discord.mrkk.tadeu.coinflip.systems.inventories.listeners.InventoriesListener;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -116,7 +116,6 @@ public class BetManager {
     private void handleWinnerLoser(Player challenger, Player creator, double betValue, boolean isCash, Player winner) {
         Player loser = winner.equals(challenger) ? creator : challenger;
 
-        // Calcula o valor do bônus (15%)
         double winRate = configuration.getConfig().getDouble("win-rate", 15);
         double bonus = betValue * (winRate / 100);
         double totalWinAmount = betValue - bonus;
@@ -126,8 +125,7 @@ public class BetManager {
             creator.sendMessage(plugin.getConfiguration().getMessage("insufficient-balance-creator"));
             return;
         }
-        
-        // Integração para ajustar saldo do vencedor e perdedor
+
         if (isCash) {
             
             CashIntegration cashIntegration = plugin.getCashIntegration();
@@ -142,7 +140,6 @@ public class BetManager {
             coinsIntegration.getEcon().depositPlayer(winner, totalWinAmount);
         }
 
-        // Envia mensagem personalizada para vencedor e perdedor
         winner.sendMessage(configuration.getMessage("bet-win")
                 .replace("{AMOUNT}", String.valueOf(totalWinAmount))
                 .replace("{MOEDA}", (isCash ? "cash" : "coins")));
@@ -150,7 +147,6 @@ public class BetManager {
                 .replace("{AMOUNT}", String.valueOf(betValue))
                 .replace("{MOEDA}", (isCash ? "cash" : "coins")));
 
-        // Lógica de broadcast para apostas acima do limite mínimo
         double minBroadcastValue = isCash
                 ? configuration.getConfig().getDouble("min-cash-value-for-broadcast")
                 : configuration.getConfig().getDouble("min-coins-value-for-broadcast");
@@ -162,7 +158,6 @@ public class BetManager {
                     .replace("{AMOUNT}", String.valueOf(totalWinAmount))
                     .replace("{MOEDA}", (isCash ? "cash" : "coins"));
 
-            // Executa o comando de broadcast
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), broadcastCommand);
         }
     }
@@ -183,7 +178,7 @@ public class BetManager {
     @AllArgsConstructor
     public static class Bet {
         private final String playerName;
-        private final String type; // "Coins" ou "Cash"
+        private final String type;
         private final String value;
     }
 }

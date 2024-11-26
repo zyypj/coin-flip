@@ -1,4 +1,4 @@
-package gg.discord.mrkk.tadeu.coinflip.inventories;
+package gg.discord.mrkk.tadeu.coinflip.systems.inventories;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import gg.discord.mrkk.tadeu.coinflip.configuration.Configuration;
@@ -32,35 +32,34 @@ public class BetInventory {
         player.openInventory(inventory);
     }
 
-    // Atualiza o inventário com itens, filtros e apostas.
     private void updateInventory(Player player, Inventory inventory) {
-        inventory.clear(); // Limpa o inventário atual.
-        addBorders(inventory); // Adiciona bordas decorativas ao inventário.
-        addBets(player, inventory); // Adiciona os itens de apostas ao inventário.
-        addEconomiesItens(inventory); // Adiciona itens de economia (Coins e Cash).
-        addNavigationButtons(player, inventory); // Adiciona botões de navegação para trocar de página.
-        addFilterItem(player, inventory); // Adiciona o ‘item’ de filtro para filtrar tipos de apostas.
+        inventory.clear();
+        addBorders(inventory);
+        addBets(player, inventory);
+        addEconomiesItens(inventory);
+        addNavigationButtons(player, inventory);
+        addFilterItem(player, inventory);
     }
 
     private void addBorders(Inventory inventory) {
-        ItemStack borderItem = new ItemBuilder(Material.AIR).create(); // Item vazio (decorativo).
-        for (int i = 0; i < 9; i++) { // Adiciona itens à primeira linha.
+        ItemStack borderItem = new ItemBuilder(Material.AIR).create();
+        for (int i = 0; i < 9; i++) {
             inventory.setItem(i, borderItem);
         }
-        for (int i = 45; i < 54; i++) { // Adiciona itens à última linha.
+        for (int i = 45; i < 54; i++) {
             inventory.setItem(i, borderItem);
         }
-        inventory.setItem(36, borderItem); // Adiciona ao lado esquerdo.
-        inventory.setItem(44, borderItem); // Adiciona ao lado direito.
+        inventory.setItem(36, borderItem);
+        inventory.setItem(44, borderItem);
     }
 
     private void addBets(Player player, Inventory inventory) {
-        BetManager betManager = plugin.getBetManager(); // Obtém o gerenciador de apostas.
-        List<BetManager.Bet> bets = betManager.getAllBets(); // Obtém todas as apostas.
+        BetManager betManager = plugin.getBetManager();
+        List<BetManager.Bet> bets = betManager.getAllBets();
 
-        boolean includeOwnBets = configuration.getConfig().getBoolean("bet-yourself", true); // Se deve incluir apostas do próprio jogador.
+        boolean includeOwnBets = configuration.getConfig().getBoolean("bet-yourself", true);
 
-        // Filtra as apostas com base no filtro atual e configurações.
+
         List<BetManager.Bet> filteredBets = bets.stream()
                 .filter(bet -> {
                     boolean isOwnBet = bet.getPlayerName().equalsIgnoreCase(player.getName());
@@ -72,24 +71,20 @@ public class BetInventory {
                 })
                 .collect(Collectors.toList());
 
-        // Determina quais apostas aparecem na página atual.
         int startIndex = (currentPage - 1) * 16;
         int endIndex = Math.min(startIndex + 16, filteredBets.size());
         List<BetManager.Bet> pageBets = filteredBets.subList(startIndex, endIndex);
 
-        // Define os slots para exibir apostas.
         int[] betSlots = {
                 10, 11, 12, 13, 14, 15,
                 19, 20, 21, 22, 23, 24
         };
 
-        // Adiciona as apostas ao inventário.
         for (int i = 0; i < pageBets.size() && i < betSlots.length; i++) {
             BetManager.Bet bet = pageBets.get(i);
             inventory.setItem(betSlots[i], createBetItem(bet));
         }
 
-        // Adiciona um item vazio no centro se não houver apostas.
         if (pageBets.isEmpty()) {
             inventory.setItem(22, createEmptyItem());
         }
@@ -97,24 +92,21 @@ public class BetInventory {
 
     private void addNavigationButtons(Player player, Inventory inventory) {
         BetManager betManager = plugin.getBetManager();
-        int totalPages = (int) Math.ceil((double) betManager.getAllBets().size() / 16); // Calcula o total de páginas.
+        int totalPages = (int) Math.ceil((double) betManager.getAllBets().size() / 16);
 
-        // Botão de página anterior.
         if (currentPage > 1) {
             inventory.setItem(36, createNavigationItem("§aPágina Anterior"));
         }
 
-        // Botão de próxima página.
         if (currentPage < totalPages) {
             inventory.setItem(44, createNavigationItem("§aPróxima Página"));
         }
     }
 
     private void addEconomiesItens(Inventory inventory) {
-        Configuration.ItemData coinsItemData = configuration.getCoinsItem(); // Obtém dados do item de Coins.
-        Configuration.ItemData cashItemData = configuration.getCashItem(); // Obtém dados do item de Cash.
+        Configuration.ItemData coinsItemData = configuration.getCoinsItem();
+        Configuration.ItemData cashItemData = configuration.getCashItem();
 
-        // Adiciona os itens no inventário.
         inventory.setItem(37, coinsItemData.toItemStack());
         inventory.setItem(43, cashItemData.toItemStack());
     }

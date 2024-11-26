@@ -1,4 +1,4 @@
-package gg.discord.mrkk.tadeu.coinflip.hooks;
+package gg.discord.mrkk.tadeu.coinflip.integrations;
 
 import lombok.Getter;
 import org.black_ixx.playerpoints.PlayerPoints;

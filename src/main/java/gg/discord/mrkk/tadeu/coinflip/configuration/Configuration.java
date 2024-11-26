@@ -1,7 +1,7 @@
 package gg.discord.mrkk.tadeu.coinflip.configuration;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
-import gg.discord.mrkk.tadeu.coinflip.systems.head.HeadUtil;
+import gg.discord.mrkk.tadeu.coinflip.tools.head.HeadUtil;
 import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -9,10 +9,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
@@ -72,7 +70,6 @@ public class Configuration {
             return;
         }
 
-        // Carregar a configuração atual
         FileConfiguration currentConfig = YamlConfiguration.loadConfiguration(configFile);
 
         try (Reader reader = new InputStreamReader(defaultConfigStream, StandardCharsets.UTF_8)) {

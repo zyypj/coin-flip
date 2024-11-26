@@ -4,11 +4,13 @@ import com.google.common.base.Stopwatch;
 import com.henryfabio.minecraft.inventoryapi.manager.InventoryManager;
 import gg.discord.mrkk.tadeu.coinflip.commands.CoinFlipCommand;
 import gg.discord.mrkk.tadeu.coinflip.configuration.Configuration;
-import gg.discord.mrkk.tadeu.coinflip.hooks.CashIntegration;
-import gg.discord.mrkk.tadeu.coinflip.hooks.CoinsIntegration;
-import gg.discord.mrkk.tadeu.coinflip.inventories.view.Views;
-import gg.discord.mrkk.tadeu.coinflip.listeners.InventoriesListener;
+import gg.discord.mrkk.tadeu.coinflip.integrations.CashIntegration;
+import gg.discord.mrkk.tadeu.coinflip.integrations.CoinsIntegration;
+import gg.discord.mrkk.tadeu.coinflip.systems.inventories.view.Views;
+import gg.discord.mrkk.tadeu.coinflip.systems.inventories.listeners.InventoriesListener;
+import gg.discord.mrkk.tadeu.coinflip.systems.animator.AnimationManager;
 import gg.discord.mrkk.tadeu.coinflip.systems.bet.BetManager;
+import gg.discord.mrkk.tadeu.coinflip.tools.head.HeadCache;
 import gg.discord.mrkk.tadeu.coinflip.systems.response.ResponseHandler;
 import gg.discord.mrkk.tadeu.coinflip.systems.response.ResponseWaiter;
 import lombok.Getter;
@@ -26,7 +28,10 @@ public final class Main extends JavaPlugin {
 
     private Views views;
 
+    private HeadCache headCache;
+
     private BetManager betManager;
+    private AnimationManager animationManager;
 
     private ResponseWaiter responseWaiter;
     private ResponseHandler responseHandler;
@@ -87,6 +92,8 @@ public final class Main extends JavaPlugin {
         coinsIntegration = new CoinsIntegration(this);
         cashIntegration = new CashIntegration();
 
+        this.headCache = new HeadCache();
+
         coinsIntegration.setupEconomy();
         cashIntegration.loadPpAPI();
 
@@ -99,6 +106,7 @@ public final class Main extends JavaPlugin {
         log(" ", false);
         log("&eCarregando gerenciadores...", false);
 
+        animationManager = new AnimationManager(this);
         betManager = new BetManager(this);
 
         log("&aGerenciadores carregados em " + stopwatch.stop() + "!", false);

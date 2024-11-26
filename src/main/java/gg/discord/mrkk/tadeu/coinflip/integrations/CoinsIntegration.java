@@ -1,4 +1,4 @@
-package gg.discord.mrkk.tadeu.coinflip.hooks;
+package gg.discord.mrkk.tadeu.coinflip.integrations;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package gg.discord.mrkk.tadeu.coinflip.systems.head;
+package gg.discord.mrkk.tadeu.coinflip.tools.head;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -31,15 +31,15 @@ public class HeadUtil {
     }
 
     public static ItemStack getPlayerSkull(String playerName) {
-        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) 3); // SKULL_ITEM para 1.8.8
+        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
 
-        skullMeta.setOwner(playerName); // Define o nome do jogador para a skin
+        skullMeta.setOwner(playerName);
         skull.setItemMeta(skullMeta);
         return skull;
     }
 
     public static ItemStack getDefaultSkull() {
-        return getPlayerSkull("MHF_Steve"); // Padrão: Steve (pode ser substituído por Alex)
+        return getPlayerSkull("MHF_Steve");
     }
 }
