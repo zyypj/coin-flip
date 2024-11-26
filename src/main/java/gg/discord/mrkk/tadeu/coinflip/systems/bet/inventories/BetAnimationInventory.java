@@ -1,4 +1,4 @@
-package gg.discord.mrkk.tadeu.coinflip.systems.inventories;
+package gg.discord.mrkk.tadeu.coinflip.systems.bet.inventories;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import org.bukkit.Bukkit;

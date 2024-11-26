@@ -1,11 +1,11 @@
-package gg.discord.mrkk.tadeu.coinflip.systems.inventories.listeners;
+package gg.discord.mrkk.tadeu.coinflip.systems.bet.inventories.listeners;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import gg.discord.mrkk.tadeu.coinflip.configuration.Configuration;
 import gg.discord.mrkk.tadeu.coinflip.integrations.CashIntegration;
 import gg.discord.mrkk.tadeu.coinflip.integrations.CoinsIntegration;
-import gg.discord.mrkk.tadeu.coinflip.systems.inventories.BetAnimationInventory;
-import gg.discord.mrkk.tadeu.coinflip.systems.inventories.BetInventory;
+import gg.discord.mrkk.tadeu.coinflip.systems.bet.inventories.BetAnimationInventory;
+import gg.discord.mrkk.tadeu.coinflip.systems.bet.inventories.BetInventory;
 import gg.discord.mrkk.tadeu.coinflip.systems.bet.BetManager;
 import gg.discord.mrkk.tadeu.coinflip.systems.response.ResponseHandler;
 import lombok.Getter;

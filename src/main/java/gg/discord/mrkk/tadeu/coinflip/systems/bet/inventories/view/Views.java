@@ -1,7 +1,7 @@
-package gg.discord.mrkk.tadeu.coinflip.systems.inventories.view;
+package gg.discord.mrkk.tadeu.coinflip.systems.bet.inventories.view;
 
 import gg.discord.mrkk.tadeu.coinflip.Main;
-import gg.discord.mrkk.tadeu.coinflip.systems.inventories.BetInventory;
+import gg.discord.mrkk.tadeu.coinflip.systems.bet.inventories.BetInventory;
 import lombok.Getter;
 
 @Getter

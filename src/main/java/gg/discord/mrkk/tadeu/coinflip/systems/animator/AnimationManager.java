@@ -1,6 +1,6 @@
 package gg.discord.mrkk.tadeu.coinflip.systems.animator;
 
-import gg.discord.mrkk.tadeu.coinflip.systems.inventories.BetAnimationInventory;
+import gg.discord.mrkk.tadeu.coinflip.systems.bet.inventories.BetAnimationInventory;
 import gg.discord.mrkk.tadeu.coinflip.Main;
 import org.bukkit.scheduler.BukkitRunnable;
 
